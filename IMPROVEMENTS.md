@@ -1,14 +1,60 @@
 # Melhorias Implementadas
 
-## 1. Apple Watch na Rodada 6 + CPF com Erro Persistente (NOVA - 2025-11-20)
+## 1. Apple Watch na Rodada 7 + Primeiro Deposito Libera Saque (NOVA - 2025-11-24)
 ### Alteracoes Implementadas:
 
-#### 1.1 Apple Watch agora vem na rodada 6
+#### 1.1 Apple Watch agora vem na rodada 7
+- Alterado de rodada 6 para rodada 7
+- Arquivo modificado: `src/hooks/useGameState.ts`
+- Linha alterada: `if (roundNumber === 7)` ao inves de `if (roundNumber === 6)`
+
+#### 1.2 Primeiro deposito ja libera saque
+**Problema resolvido:**
+- Antes, o primeiro deposito gerava erro de dados divergentes
+- Usuario precisava fazer segundo deposito para poder sacar
+
+**Solucao implementada:**
+- Removida toda logica de erro no primeiro deposito
+- Primeiro deposito de verificacao (R$ 4,90) ja credita o valor
+- Primeiro deposito ja marca KYC como verificado
+- Usuario ja pode sacar apos primeiro deposito
+
+**Logica simplificada:**
+```typescript
+// Deposito de verificacao KYC
+if (kycDepositAmount && amount >= kycDepositAmount) {
+  addBalance(amount);
+
+  const updatedKYC = {
+    ...gameState.kycStatus,
+    depositVerified: true,
+    isVerified: true,
+    identityVerified: true,
+    depositAttempts: 1
+  };
+  updateKYCStatus(updatedKYC);
+}
+```
+
+**Arquivos modificados:**
+- `src/hooks/useGameState.ts` - Apple Watch rodada 7
+- `src/components/GameDashboard.tsx` - Simplificar logica de deposito
+
+**Componentes removidos:**
+- Removida importacao e uso de `DataMismatchModal`
+- Removida variavel `showDataMismatchModal`
+- Removida variavel `depositedAmount`
+- Removida funcao `handleReviewData`
+
+## 2. Apple Watch na Rodada 6 + CPF com Erro Persistente (2025-11-20)
+### Alteracoes Implementadas:
+
+#### 2.1 Apple Watch agora vem na rodada 6
 - Alterado de rodada 5 para rodada 6
 - Arquivo modificado: `src/hooks/useGameState.ts`
 - Linha alterada: `if (roundNumber === 6)` ao inves de `if (roundNumber === 5)`
 
-#### 1.2 Erro do CPF persistente na verificacao KYC
+#### 2.2 Erro do CPF persistente na verificacao KYC
 **Problema resolvido:**
 - O erro do digito do CPF era gerado toda vez que o modal abria/fechava
 - Isso mudava o digito errado a cada abertura, confundindo o usuario
